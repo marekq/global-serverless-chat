@@ -10,20 +10,18 @@ Globals:
 
 Parameters:
     MyTable:
-        Type: String
-        Default: geochat
-
-Parameters:
-  ProjectId:
-    Type: String
-    Description: AWS CodeStar project ID.
-  CodeDeployRole:
-    Type: String
-    Description: IAM role to allow AWS CodeDeploy to manage deployment of AWS Lambda functions
-  Stage:
-    Type: String
-    Description: The name for a project pipeline stage, such as Staging or Prod, for which resources are provisioned and deployed.
-    Default: ''
+      Type: String
+      Default: geochat
+    ProjectId:
+    	Type: String
+    	Description: AWS CodeStar project ID.
+    CodeDeployRole:
+    	Type: String
+    	Description: IAM role to allow AWS CodeDeploy to manage deployment of AWS Lambda functions
+    Stage:
+    	Type: String
+    	Description: The name for a project pipeline stage, such as Staging or Prod, for which resources are provisioned and deployed.
+    	Default: ''
 
 Resources:
   html:
