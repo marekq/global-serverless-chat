@@ -30,7 +30,8 @@ Resources:
       Handler: index.handler
       Runtime: python3.7
       Policies:
-        - AmazonDynamoDBFullAccess
+        - DynamoDBCrudPolicy:
+            TableName: !Ref MyTable
       CodeUri: ./lambda
       Description: 'Lambda function to serve HTML traffic through API Gateway'
       MemorySize: 128
