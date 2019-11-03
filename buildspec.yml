@@ -6,13 +6,11 @@ phases:
       python: 3.7
     commands:
 
-      # Upgrade AWS CLI to the latest version
       - pip install --upgrade awscli
 
   pre_build:
     commands:
-
-      - python -m unittest discover tests
+      - echo 'run your unit tests here'
   
   build:
     commands:
