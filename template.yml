@@ -4,7 +4,7 @@ Transform: 'AWS::Serverless-2016-10-31'
 Parameters:
     MyTable:
         Type: String
-	Default: geochat
+        Default: geochat
 
 Resources:
   html:
