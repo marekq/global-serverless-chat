@@ -5,7 +5,6 @@ phases:
     runtime-versions:
       python: 3.7
     commands:
-
       - pip install --upgrade awscli
 
   pre_build:
@@ -15,8 +14,8 @@ phases:
   build:
     commands:
       - echo $S3_BUCKET
+      - ls -alFh
       - aws cloudformation package --template template.yml --s3-bucket $S3_BUCKET --output-template template-export.yml
-
       - sed -i.bak 's/\$PARTITION\$/'${PARTITION}'/g;s/\$AWS_REGION\$/'${AWS_REGION}'/g;s/\$ACCOUNT_ID\$/'${ACCOUNT_ID}'/g;s/\$PROJECT_ID\$/'${PROJECT_ID}'/g' template-configuration.json
 
 artifacts:
