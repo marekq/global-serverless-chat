@@ -10,7 +10,6 @@ phases:
   pre_build:
     commands:
       - echo 'run your unit tests here'
-      - aws s3 cp template.yml s3://codepipeline-us-east-1-237435987611/
   
   build:
     commands:
