@@ -23,7 +23,7 @@ def return_html(b):
 		}
 	}
 
-	body            = '<html><body><center><br><h1>Welcome to the Global Serverless demo!</h1>'
+	body            = '<html><body><center><br><h1>Welcome to the Global Serverless Chat demo!</h1>'
 	body            += '<br><h2>This request is served from '+str(environ['AWS_REGION'])+'</h2><br>'
 	body            += str(b)
 	body            += '</center></body></html>'
@@ -51,7 +51,7 @@ def get_messages():
 
 # GET users
 def get_table(msg):
-	body        = '<table width = "600"><tr><th>unix timestamp</th><th>timestamp (utc)</th><th>user</th><th>message</th></tr><tr>'
+	body        = '<table width = "800"><tr><th>unix timestamp</th><th>timestamp (utc)</th><th>user</th><th>message</th></tr><tr>'
 
 	for x in msg:
 		body    += x

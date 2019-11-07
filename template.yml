@@ -32,7 +32,7 @@ Resources:
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref MyTable
-      CodeUri: ./lambda
+      CodeUri: lambda
       Description: 'Lambda function to serve HTML traffic through API Gateway'
       MemorySize: 128
       Timeout: 5
