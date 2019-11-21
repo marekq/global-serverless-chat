@@ -15,7 +15,7 @@ Resources:
     Type: 'AWS::Serverless::Function'
     Properties:
       Handler: index.handler
-      Runtime: python3.7
+      Runtime: python3.8
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref MyTable
@@ -24,7 +24,7 @@ Resources:
       MemorySize: 128
       Timeout: 5
       Tracing: Active
-      ReservedConcurrentExecutions: 10
+      ReservedConcurrentExecutions: 5
       Events:
         GetHtml:
           Type: Api
@@ -38,4 +38,3 @@ Resources:
 Outputs:
   WebInterface:
     Value: { "Fn::Sub" : "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/home/"}
-
