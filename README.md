@@ -10,6 +10,7 @@ Setup
 Prior to deploying the app, you need to do the following;
 
 - Create the DynamoDB table and set up global replication to the other regions where you want to deploy the app. Give it any name you like and set the primary partition key to 'user' and the primary sort key to 'timest'. In the future, a CloudFormation template will be added that does this for you.
+- Edit 'regions.txt' with the regions where you want to deploy. By default, 'eu-west-1' (Ireland), 'us-east-1' (North Virginia) and 'ap-northeast-1' (Tokyo) are included. 
 - Install AWS SAM on your local machine and run 'bash deploy.sh'. In order to deploy to another region, use 'bash deploy.sh *region* (i.e. us-east-1).
 
 
