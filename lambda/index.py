@@ -9,7 +9,7 @@ from boto3 import resource
 import botocore.vendored.requests as requests
 from os import environ
 from datetime import datetime, timedelta
-import urllib3
+import time, urllib3
 
 # set up connections with cognito and dynamodb using boto3
 dynamo  = resource('dynamodb').Table(environ['dynamotable'])
@@ -55,20 +55,21 @@ def get_messages():
 	r           = []
 
 	# print the username, timestamp and message 
-	for y in range(l):
+	for y in  sorted(range(l), reverse = True):
 		usr     = str(x['Items'][y]['user'])
 		msg     = str(x['Items'][y]['message'])
 		tim     = x['Items'][y]['timest']
 		dat 	= datetime.utcfromtimestamp(int(tim)).strftime('%Y-%m-%d %H:%M:%S')
+		age 	= get_date(tim)
 
-		r.append('<tr><td>'+usr+'</td><td>'+str(dat)[5:16]+'</td><td>'+msg +'</td></tr>')
+		r.append('<tr><td>'+usr+'</td><td>'+str(age)+'</td><td>'+msg +'</td></tr>')
 
 	# return the html content
 	return r
 
 # return html for GET users request
 def get_table(msg):
-	body        = '<center><table width = 100%><tr><th>user</th><th>date</th><th>message</th></tr><tr>'
+	body        = '<center><table width = 100%><tr><th>user</th><th>age</th><th>message</th></tr><tr>'
 
 	for x in msg:
 		body    += x
@@ -76,7 +77,34 @@ def get_table(msg):
 	body        += '</table></center>'
 
 	return body
+
+# determine how old the chat message is  
+def get_date(x):
+	y		= time.time()
+	z		= int(y) - int(x)
 	
+	years	= str(int(int(z)/31536000))
+	months	= str(int(int(z)/2592000))
+	weeks	= str(int(int(z)/604800))
+	days	= str(int(int(z)/86400))
+	hours	= str(int(int(z)/3600) % 24)
+	mins 	= str(int(int(z)/60) % 3600)
+
+	if days == str('0') and hours != str('0'):
+		return hours+'h'
+
+	elif days == str('0') and hours == str('0'):
+		return mins+'m'
+	
+	elif int(days) < int(31):
+		return days+'d'
+
+	elif int(days) < int(365):
+		return weeks+'w'
+
+	else:
+		return years+'y'
+
 # lambda handler
 def handler(event, context):
 	# handle GET requests by returning an HTML page
