@@ -1,0 +1,44 @@
+<head>
+<!-- refresh the page every three seconds -->
+<meta http-equiv="Refresh" content="3" charset="utf-8">
+
+<!-- setting some style properties -->
+<style>
+a:link, a:visited {
+	color: gray;
+}
+
+table {
+	max-width: 1000px;
+}
+
+h2 {
+	font-family: monospace;
+	font-size: 25px;
+	color: #555;
+	padding: 5px;
+	text-align: center;
+}
+
+body {
+	margin-top: 40px;
+	background-color: #D3D3D3
+}
+
+th {
+	text-align: left;
+}
+
+div {
+	text-align: center;
+	background-color: white;
+	max-width: 1200px;
+	font-family: monospace;
+	font-size: 20px;
+	color: #555;
+	padding: 25px;
+	border-radius: 30px;
+}
+
+</style>
+</head>
