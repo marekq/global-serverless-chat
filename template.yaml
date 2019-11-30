@@ -21,16 +21,21 @@ Resources:
             TableName: !Ref MyTable
       CodeUri: lambda
       Description: 'Lambda function to serve HTML traffic through API Gateway'
-      MemorySize: 128
-      Timeout: 5
+      MemorySize: 256
+      Timeout: 3
       Tracing: Active
-      ReservedConcurrentExecutions: 5
+      ReservedConcurrentExecutions: 3
       Events:
         GetHtml:
           Type: Api
           Properties:
             Path: '/{proxy+}'
             Method: get
+        PostHtml:
+          Type: Api
+          Properties:
+            Path: '/{proxy+}'
+            Method: post
       Environment:
         Variables:
           dynamotable: !Ref MyTable

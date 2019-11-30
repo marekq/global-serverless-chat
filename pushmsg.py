@@ -11,7 +11,7 @@ def push():
 	Item = {
 	    'timest'	: {"S": ts } ,
 	    'message'	: {"S": msg},
-            'user'      : {"S": user }
+        'user'      : {"S": user }
 	})
 
     print('added item '+msg+' from user '+user)

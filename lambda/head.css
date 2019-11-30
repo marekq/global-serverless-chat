@@ -1,6 +1,6 @@
 <head>
-<!-- refresh the page every three seconds -->
-<meta http-equiv="Refresh" content="3" charset="utf-8">
+<!-- refresh the page every sixty seconds -->
+<meta http-equiv = "Refresh" content = "60" charset = "utf-8">
 
 <!-- setting some style properties -->
 <style>
@@ -9,7 +9,7 @@ a:link, a:visited {
 }
 
 table {
-	max-width: 800px;
+	max-width: 600px;
 }
 
 h2 {
@@ -22,11 +22,15 @@ h2 {
 
 body {
 	margin-top: 40px;
-	background-color: #D3D3D3
+	background-color: %COLOR%
 }
 
 th {
 	text-align: left;
+}
+
+form {
+	font-size: 16px;
 }
 
 div {
@@ -41,4 +45,11 @@ div {
 }
 
 </style>
+
+<script>
+    if ( window.history.replaceState ) {
+        window.history.replaceState( null, null, window.location.href );
+    }
+</script>
+
 </head>
