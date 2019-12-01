@@ -39,7 +39,7 @@ def get_lambda_ip():
 		# write the ip address to the /tmp/ip.txt file
 		f 		= open(ipfile, 'w')
 		f.write(ip)
-		f.close
+		f.close()
 
 	return ip
 
