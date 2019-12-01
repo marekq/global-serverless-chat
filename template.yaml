@@ -11,17 +11,17 @@ Parameters:
     Default: ''
 
 Resources:
-  html:
+  frontend:
     Type: 'AWS::Serverless::Function'
     Properties:
-      Handler: index.handler
+      Handler: frontend.handler
       Runtime: python3.8
       Policies:
-        - DynamoDBCrudPolicy:
+        - DynamoDBReadPolicy:
             TableName: !Ref MyTable
-      CodeUri: lambda
+      CodeUri: lambda/frontend
       Description: 'Lambda function to serve HTML traffic through API Gateway'
-      MemorySize: 256
+      MemorySize: 512
       Timeout: 3
       Tracing: Active
       ReservedConcurrentExecutions: 3
@@ -31,6 +31,26 @@ Resources:
           Properties:
             Path: '/{proxy+}'
             Method: get
+      Environment:
+        Variables:
+          dynamotable: !Ref MyTable
+
+  backend:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: backend.handler
+      Runtime: python3.8
+      Policies:
+        - ComprehendReadOnly
+        - DynamoDBCrudPolicy:
+            TableName: !Ref MyTable
+      CodeUri: lambda/backend
+      Description: 'Lambda function receiving post messages which are written into DynamoDB'
+      MemorySize: 512
+      Timeout: 10
+      Tracing: Active
+      ReservedConcurrentExecutions: 3
+      Events:
         PostHtml:
           Type: Api
           Properties:
