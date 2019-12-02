@@ -112,8 +112,8 @@ def get_messages():
 
 	# scan all messages in the table
 	x           = ddb.scan(TableName = environ['dynamotable'])
-	l           = len(x['Items'])
 	r, t        = [], []
+	l			= len(x['Items'])
 
 	# print the username, timestamp and message 
 	for y in range(l):
@@ -126,6 +126,23 @@ def get_messages():
 		# get the time difference
 		age 	= get_date(tim)
 		t.append([tim, age, usr, msg, cou, dat])
+
+	while  'LastEvaluatedKey' in x:
+		x 			= ddb.scan(TableName = environ['dynamotable'], ExclusiveStartKey = x['LastEvaluatedKey'])
+		l           = len(x['Items'])
+
+		# print the username, timestamp and message 
+		for y in range(l):
+			usr 	= str(x['Items'][y]['user']['S'])[:15]
+			msg     = str(x['Items'][y]['message']['S'])[:40]
+			tim     = str(x['Items'][y]['timest']['S'])
+			cou 	= str(x['Items'][y]['country']['S'])[:3]
+			dat 	= str(datetime.utcfromtimestamp(int(tim)).strftime('%Y-%m-%d %H:%M:%S'))+' GMT'
+
+			# get the time difference
+			age 	= get_date(tim)
+			t.append([tim, age, usr, msg, cou, dat])
+
 
 	# print user, age, user, message, country, timestring
 	for y in sorted(t, reverse = True):
