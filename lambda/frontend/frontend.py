@@ -91,14 +91,15 @@ def return_html(b):
 	# parse the html output, generate the background color of the page
 	body            = '<html>'+open('./head.css').read().replace('%COLOR%', str(ip2int(lambdaip)))
 	body 		 	+= '<body><center><div><br>'
-	body 	 		+= '<p><h1>Welcome to the global serverless chat!</h1><p><br>'
-	body 			+=  '<p><form method = "post"> username <input type = "username" name = "username" />'
+	body 	 		+= '<p><h2>Welcome to the global serverless chat!</h2><p>'
+	body 			+= '<p>This page is served from a Lambda function that stores chat messages in DynamoDB. You can find the source code for the application <a href = "https://github.com/marekq/global-serverless-chat">here</a>.<br><br>'
+	body 			+= '<p><form method = "post"> username <input type = "username" name = "username" />'
 	body 			+= ' message <input type = "message" name = "message" />'
-	body 			+= '<input type = "submit" /></form></p>'
-	body            += str(b)
+	body 			+= '<input type = "submit" value = "send message" /></form></p><br>'
+	body            += '<p>'+str(b)+'</p><br>'
 	body 			+= '<p>region '+str(environ['AWS_REGION'])+' &#8226; '
 	body 			+= 'ip '+str(lambdaip)+' &#8226; '
-	body 			+= 'uptime '+str(uptime_string)+'</p>'
+	body 			+= 'uptime '+str(uptime_string)+'</p><br>'
 	body            += '</div></center></body></html>'
 	
 	resp['body']    = body
@@ -120,14 +121,15 @@ def get_messages():
 		msg     = str(x['Items'][y]['message']['S'])[:40]
 		tim     = str(x['Items'][y]['timest']['S'])
 		cou 	= str(x['Items'][y]['country']['S'])[:3]
-		
+		dat 	= str(datetime.utcfromtimestamp(int(tim)).strftime('%Y-%m-%d %H:%M:%S'))+' GMT'
+
 		# get the time difference
 		age 	= get_date(tim)
-		t.append([tim, age, usr, msg, cou])
+		t.append([tim, age, usr, msg, cou, dat])
 
-	# print user, age, user, message, country
+	# print user, age, user, message, country, timestring
 	for y in sorted(t, reverse = True):
-		r.append('<tr><td width = 150px>'+y[2]+'</td><td  width = 100px>'+y[1]+'</td><td max-width = 300px>'+str(y[3])+'</td><td width = 50px>'+str(y[4])+'</td></tr>')
+		r.append('<tr><td width = 150px>'+y[2]+'</td><td  width = 100px><span title = "'+str(dat)+'">'+y[1]+'</span></td><td max-width = 300px>'+str(y[3])+'</td><td width = 50px>'+str(y[4])+'</td></tr>')
 
 	# return the html content
 	return r

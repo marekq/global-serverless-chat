@@ -72,7 +72,6 @@ def write_msg(user, msg, ipuser, ipcountry):
 	else:
 		print('### not added text due to negative score, user: '+str(user)+', message: '+str(msg))
 
-
 # lambda handler for the http request
 def handler(event, context):
 
@@ -90,13 +89,18 @@ def handler(event, context):
 		# lookup the users country
 		ipc 	= http.request('GET', 'https://ipinfo.io/'+ipu+'/country').data.decode("utf-8").strip()
 
+		# if localhost is submitting (i.e. sam local), set the country to NL
+		if ipu == '127.0.0.1':
+			ipc = 'NL'
+
+		# if the country is unknown, set to '??'
 		if len(ipc) == 0:
 			ipc = '??'
 
 		# write the message to DynamoDB
 		write_msg(user, msg, ipu, ipc)
 
+	# return a 301 redirect back go the original page
 	retpa	= event['path']
 	html 	= get_html_301(retpa.replace('home', 'Prod/home'))
-
 	return html
