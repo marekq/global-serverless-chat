@@ -7,7 +7,6 @@ Parameters:
     Default: 'geochat'
 
 Resources:
-
   frontend:
     Type: 'AWS::Serverless::Function'
     Properties:
@@ -15,7 +14,7 @@ Resources:
       ProvisionedConcurrencyConfig:
         ProvisionedConcurrentExecutions: 1
       Events:
-        PostHtml:
+        GetHtml:
           Type: HttpApi
           Properties:
             Path: '/'
@@ -27,7 +26,7 @@ Resources:
             TableName: !Ref MyTable
       CodeUri: lambda/frontend
       Description: 'Serve HTML traffic through API Gateway'
-      MemorySize: 128
+      MemorySize: 256
       Timeout: 3
       Tracing: Active
       ReservedConcurrentExecutions: 3
@@ -49,12 +48,12 @@ Resources:
             TableName: !Ref MyTable
       CodeUri: lambda/backend
       Description: 'Run Comprehend on the message to detect sentiment and write the record into DynamoDB'
-      MemorySize: 128
-      Timeout: 10
+      MemorySize: 256
+      Timeout: 5
       Tracing: Active
       ReservedConcurrentExecutions: 3
       Events:
-        PostHtml:
+        GetHtml:
           Type: HttpApi
           Properties:
             Path: '/'
@@ -62,3 +61,7 @@ Resources:
       Environment:
         Variables:
           dynamotable: !Ref MyTable
+
+Outputs:
+  WebInterface:
+    Value: !Sub 'https://${ServerlessHttpApi}.execute-api.${AWS::Region}.amazonaws.com/'

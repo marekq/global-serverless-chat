@@ -35,3 +35,10 @@ do
     echo -e "\n${RED} * $region * Deploying the SAM stack to AWS... ${NC}\n"
     sam deploy --template-file ./packaged.yaml --stack-name $stackn --capabilities CAPABILITY_IAM --region $region
 done
+
+# return the api gateway url for all the regions which you can visit in your browser
+for region in `cat regions.txt`
+do
+    url=$(aws cloudformation --region $region describe-stacks --stack-name $stackn --query 'Stacks[0].Outputs[0]' | awk '{print $2}')
+    echo -e "${RED} * $region * $url ${NC}"
+done
