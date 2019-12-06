@@ -5,8 +5,7 @@
 # coding: utf-8
 
 # import neccesary libraries
-import botocore.vendored.requests as requests
-import time, urllib3
+import base64, time, urllib3
 
 from boto3 import client
 from os import environ
@@ -17,21 +16,6 @@ from urllib.parse import unquote
 ddb  	= client('dynamodb')
 cmp  	= client('comprehend')
 http 	= urllib3.PoolManager()
-
-# get the posted string username and message from the headers
-def get_header(para):
-	user, msg = '', ''
-	print('@@@ '+str(para))
-
-	# split the provided username and password
-	if search('&', para):
-		for y in para.split('&'):
-			if search('username', y):
-				user    = unquote(y[9:])
-			elif search('message', y):
-				msg    = unquote(y[8:])
-
-	return user, msg
 
 # return 301 redirect
 def get_html_301(surl):
@@ -72,35 +56,53 @@ def write_msg(user, msg, ipuser, ipcountry):
 	else:
 		print('### not added text due to negative score, user: '+str(user)+', message: '+str(msg))
 
+# get the posted string username and message from the headers
+def get_header(para):
+	user, msg = '', ''
+	print('@@@ '+str(para))
+
+	# split the provided username and password
+	if search('&', para):
+		for y in para.split('&'):
+			if search('username', y):
+				user    = unquote(y[9:])
+			elif search('message', y):
+				msg    = unquote(y[8:])
+
+	return user, msg
+
 # lambda handler for the http request
 def handler(event, context):
 
 	# handle GET requests by returning an HTML page
 	para 		= event['body']
-	user, msg 	= get_header(para)
+
+	# get the requester ip
+	ipu 		= str(event['requestContext']['identity']['sourceIp'])
+
+	# lookup the users country
+	ipc 		= http.request('GET', 'https://ipinfo.io/'+ipu+'/country').data.decode("utf-8").strip()
+
+	# get the haders from the file and decode them
+	p 			= base64.b64decode(para).decode("utf-8")
+	user, msg 	= get_header(str(p))
 	print('&&& found user '+str(user)+' message '+str(msg))
 	
-	# if strings are submitted, post the message
+	# write the message to DynamoDB
 	if len(user) != 0 and len(msg) != 0:
-
-		# get the requester ip
-		ipu 	= str(event['requestContext']['identity']['sourceIp'])
-
-		# lookup the users country
-		ipc 	= http.request('GET', 'https://ipinfo.io/'+ipu+'/country').data.decode("utf-8").strip()
-
 		# if localhost is submitting (i.e. sam local), set the country to NL
 		if ipu == '127.0.0.1':
 			ipc = 'NL'
 
 		# if the country is unknown, set to '??'
-		if len(ipc) == 0:
+		elif len(ipc) == 0:
 			ipc = '??'
 
-		# write the message to DynamoDB
 		write_msg(user, msg, ipu, ipc)
+		print('wrote message '+msg+' from user '+user)
 
 	# return a 301 redirect back go the original page
 	retpa	= event['path']
 	html 	= get_html_301(retpa.replace('home', 'Prod/home'))
+
 	return html

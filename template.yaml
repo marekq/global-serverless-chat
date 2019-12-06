@@ -5,32 +5,32 @@ Parameters:
   MyTable:
     Type: String
     Default: 'geochat'
-  Stage:
-    Type: String
-    Description: The name for a project pipeline stage, such as Staging or Prod, for which resources are provisioned and deployed.
-    Default: ''
 
 Resources:
+
   frontend:
     Type: 'AWS::Serverless::Function'
     Properties:
+      AutoPublishAlias: live
+      ProvisionedConcurrencyConfig:
+        ProvisionedConcurrentExecutions: 1
+      Events:
+        PostHtml:
+          Type: HttpApi
+          Properties:
+            Path: '/'
+            Method: get
       Handler: frontend.handler
       Runtime: python3.8
       Policies:
         - DynamoDBReadPolicy:
             TableName: !Ref MyTable
       CodeUri: lambda/frontend
-      Description: 'Lambda function to serve HTML traffic through API Gateway'
-      MemorySize: 512
+      Description: 'Serve HTML traffic through API Gateway'
+      MemorySize: 128
       Timeout: 3
       Tracing: Active
       ReservedConcurrentExecutions: 3
-      Events:
-        GetHtml:
-          Type: Api
-          Properties:
-            Path: '/{proxy+}'
-            Method: get
       Environment:
         Variables:
           dynamotable: !Ref MyTable
@@ -38,6 +38,9 @@ Resources:
   backend:
     Type: 'AWS::Serverless::Function'
     Properties:
+      AutoPublishAlias: live
+      ProvisionedConcurrencyConfig:
+        ProvisionedConcurrentExecutions: 1
       Handler: backend.handler
       Runtime: python3.8
       Policies:
@@ -45,21 +48,17 @@ Resources:
         - DynamoDBCrudPolicy:
             TableName: !Ref MyTable
       CodeUri: lambda/backend
-      Description: 'Lambda function receiving post messages which are written into DynamoDB'
-      MemorySize: 512
+      Description: 'Run Comprehend on the message to detect sentiment and write the record into DynamoDB'
+      MemorySize: 128
       Timeout: 10
       Tracing: Active
       ReservedConcurrentExecutions: 3
       Events:
         PostHtml:
-          Type: Api
+          Type: HttpApi
           Properties:
-            Path: '/{proxy+}'
-            Method: post
+            Path: '/'
+            Method: post     
       Environment:
         Variables:
           dynamotable: !Ref MyTable
-
-Outputs:
-  WebInterface:
-    Value: { "Fn::Sub" : "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/home/"}

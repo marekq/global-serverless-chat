@@ -48,7 +48,7 @@ lambdaip 	= get_lambda_ip()
 
 # convert an IP to a 6 character hex code that will be the background color
 def ip2int(addr):
-	return hex(unpack("!I", inet_aton(addr))[0] * 1000)[-6:]
+	return hex(unpack("!I", inet_aton(addr))[0] + 4321 * 4321)[-6:]
 
 # get the posted string username and message from the headers
 def get_header(para):
