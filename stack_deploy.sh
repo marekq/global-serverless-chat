@@ -6,7 +6,7 @@
 bucketname=${1:-marekq}
 
 # OPTIONALLY, CHANGE TO YOUR CLOUDFORMATION STACK NAME
-stackn='global-chat'	
+stackn='chat-lambda'	
 
 ############################################################
 

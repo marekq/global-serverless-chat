@@ -20,7 +20,7 @@ h2 {
 }
 
 body {
-	margin-top: 40px;
+	margin-top: 42px;
 	background-color: %COLOR%
 }
 
@@ -39,8 +39,8 @@ div {
 	font-family: monospace;
 	font-size: 16px;
 	color: #555;
-	padding: 25px;
-	border-radius: 30px;
+	padding: 20px;
+	border-radius: 20px;
 }
 
 </style>
