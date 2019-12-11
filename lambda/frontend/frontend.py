@@ -119,7 +119,7 @@ def get_messages():
 	for y in range(l):
 		usr     = str(x['Items'][y]['user']['S'])[:15]
 		msg     = str(x['Items'][y]['message']['S'])[:40]
-		tim     = str(x['Items'][y]['timest']['S'])
+		tim     = str(x['Items'][y]['timest']['S']).split('.')[0]
 		cou 	= str(x['Items'][y]['country']['S'])[:3]
 		dat 	= str(datetime.utcfromtimestamp(int(tim)).strftime('%Y-%m-%d %H:%M:%S'))+' GMT'
 

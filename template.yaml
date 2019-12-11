@@ -2,19 +2,33 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: 'AWS::Serverless-2016-10-31'
 
 Parameters:
+  StackName:
+    Description: Name of the Cloudformation stack
+    Type: String
+    Default: chat-webpage
+
   MyTable:
-    Description: Name of the CloudFormation stack
+    Description: Name of the DynamoDB table stack
     Type: String
     Default: geochat
 
   CreateDNSRecord: 
-    Description: Environment type
-    Default: Create
+    Description: Create a public DNS record with Route53
+    Default: DontCreate
     Type: String
     AllowedValues: 
       - Create
       - DontCreate
     ConstraintDescription: CreateDNSRecord must specify Create or DontCreate
+
+  CreatePublicBucket: 
+    Description: Create a public S3 bucket for the HTTP 301 redirect
+    Default: DontCreate
+    Type: String
+    AllowedValues: 
+      - Create
+      - DontCreate
+    ConstraintDescription: CreatePublicBucket must specify Create or DontCreate
 
   Route53ZoneID:
     Description: The ID of your existing Route53 Hosted Zone that contains the DNS zone used for record creation
@@ -24,22 +38,26 @@ Parameters:
   Subdomain:
     Description: The DNS subdomain of your existing Route53 Hosted Zone where records will be created
     Default: chat.marek.rocks
-    Type: String    
+    Type: String
 
 Globals:
   Function:
     Environment:
       Variables:
         dynamotable: !Ref MyTable
-    AutoPublishAlias: live
-    ProvisionedConcurrencyConfig:
-      ProvisionedConcurrentExecutions: 1
+    # commented this out for the time being as it slows down deploys significantly
+    #
+    # AutoPublishAlias: live
+    # ProvisionedConcurrencyConfig:
+    #   ProvisionedConcurrentExecutions: 1
     Runtime: python3.8
     Tracing: Active
     ReservedConcurrentExecutions: 3
+    MemorySize: 512
 
 Conditions: 
   EnableDNSRecord: !Equals [ !Ref CreateDNSRecord, Create ]
+  EnablePublicBucket: !Equals [ !Ref CreatePublicBucket, Create ]
   
 Resources:
   frontend:
@@ -58,7 +76,6 @@ Resources:
             TableName: !Ref MyTable
       CodeUri: lambda/frontend
       Description: 'Serve HTML traffic through API Gateway'
-      MemorySize: 512
       Timeout: 3
 
   backend:
@@ -71,7 +88,6 @@ Resources:
             TableName: !Ref MyTable
       CodeUri: lambda/backend
       Description: 'Run Comprehend on the message to detect sentiment and write the record into DynamoDB'
-      MemorySize: 512
       Timeout: 5
       Events:
         GetHtml:
@@ -88,19 +104,32 @@ Resources:
       Name: !Sub '${AWS::Region}.${Subdomain}'
       Type: CNAME
       TTL: '60'
-      ResourceRecords:
-      - !Sub '${ServerlessHttpApi}.execute-api.${AWS::Region}.amazonaws.com'
+      ResourceRecords: 
+      - !Sub '${Subdomain}.s3-website-eu-west-1.amazonaws.com'
+
+  public301bucket:
+    Type: AWS::S3::Bucket
+    Condition: EnablePublicBucket
+    Properties:
+      AccessControl: PublicRead
+      BucketName: !Sub '${AWS::Region}.${Subdomain}'
+      WebsiteConfiguration:
+        RedirectAllRequestsTo:
+          HostName: !Sub '${ServerlessHttpApi}.execute-api.${AWS::Region}.amazonaws.com/'
+          Protocol: https
 
 Outputs:
-  WebInterface:
+  APIGateway:
     Value: !Sub 'https://${ServerlessHttpApi}.execute-api.${AWS::Region}.amazonaws.com/'
 
-  Environment:
+  WebInterface:
+    Value: !Sub 'https://${AWS::Region}.${Subdomain}/'
+
+  S3BucketURL:
+    Value: !Sub 'https://${AWS::Region}.chat.marek.rocks.s3-website-${AWS::Region}.amazonaws.com'
+
+  CreatedPublicDNS:    
     Value: !Ref CreateDNSRecord
 
-  DNS:    
-    Condition: EnableDNSRecord
-    Value: !Ref dns
-  
-  DynamoDBTable:
-    Value: !Ref MyTable
+  CreatedPublicBucket:
+    Value: !Ref CreatePublicBucket

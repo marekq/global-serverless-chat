@@ -37,7 +37,7 @@ def write_msg(user, msg, ipuser, ipcountry):
 	
 	# if the message is not classified as negative, write it to DynamoDB
 	if x != 'NEGATIVE':
-		ts 	= str(int(time.time()))
+		ts 	= str(time.time())
 
 		try:
 			ddb.put_item(TableName = environ['dynamotable'], 
